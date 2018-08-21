@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"math"
 	"testing"
+	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/stretchr/testify/assert"
 )
 
 const (
-	estimateVal = 500
+	estimateVal  = 500
+	bucketExpire = 3 * time.Hour
 )
 
 var redisClient = redis.NewClient(&redis.Options{Addr: ":6379"})
@@ -20,7 +22,7 @@ func TestRedisAcquire(t *testing.T) {
 	asserts := assert.New(t)
 
 	for i, test := range acquire1Tests {
-		nrb := NewRedisBucket(redisClient)
+		nrb := NewRedisBucket(bucketExpire, redisClient)
 		// NOTE: Reset data
 		nrb.Client.FlushDB()
 
@@ -35,7 +37,7 @@ func TestRedisAcquire(t *testing.T) {
 	}
 
 	for i, test := range acquire2Tests {
-		nrb := NewRedisBucket(redisClient)
+		nrb := NewRedisBucket(bucketExpire, redisClient)
 		// NOTE: Reset data
 		nrb.Client.FlushDB()
 
@@ -61,7 +63,7 @@ func TestRedisTryAcquire(t *testing.T) {
 	asserts := assert.New(t)
 
 	for i, test := range tryAcquireTests {
-		nrb := NewRedisBucket(redisClient)
+		nrb := NewRedisBucket(bucketExpire, redisClient)
 		// NOTE: Reset data
 		nrb.Client.FlushDB()
 
@@ -84,7 +86,7 @@ func TestRedisPanics(t *testing.T) {
 	asserts := assert.New(t)
 
 	asserts.NotPanics(func() {
-		nrb := NewRedisBucket(redisClient)
+		nrb := NewRedisBucket(bucketExpire, redisClient)
 		// NOTE: Reset data
 		nrb.Client.FlushDB()
 
@@ -92,7 +94,7 @@ func TestRedisPanics(t *testing.T) {
 	}, "token bucket fill interval is not > 0")
 
 	asserts.NotPanics(func() {
-		nrb := NewRedisBucket(redisClient)
+		nrb := NewRedisBucket(bucketExpire, redisClient)
 		// NOTE: Reset data
 		nrb.Client.FlushDB()
 
@@ -100,7 +102,7 @@ func TestRedisPanics(t *testing.T) {
 	}, "token bucket capacity is not > 0")
 
 	asserts.NotPanics(func() {
-		nrb := NewRedisBucket(redisClient)
+		nrb := NewRedisBucket(bucketExpire, redisClient)
 		// NOTE: Reset data
 		nrb.Client.FlushDB()
 
@@ -110,7 +112,7 @@ func TestRedisPanics(t *testing.T) {
 
 //------------------------------------Benchmark------------------------------------------
 func BenchmarkRedisWait(b *testing.B) {
-	nrb := NewRedisBucket(redisClient)
+	nrb := NewRedisBucket(bucketExpire, redisClient)
 	// NOTE: Reset data
 	nrb.Client.FlushDB()
 
@@ -122,7 +124,7 @@ func BenchmarkRedisWait(b *testing.B) {
 }
 
 func BenchmarkRedisAcquire(b *testing.B) {
-	nrb := NewRedisBucket(redisClient)
+	nrb := NewRedisBucket(bucketExpire, redisClient)
 	// NOTE: Reset data
 	nrb.Client.FlushDB()
 

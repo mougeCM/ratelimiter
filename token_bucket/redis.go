@@ -121,14 +121,6 @@ func (r *redisBucket) available(now time.Time) int64 {
 		return 0
 	}
 
-	// bucketInfo := r.Client.HGetAll(r.Key).Val()
-
-	// avail, latestTick := r.adjustAvail(r.currentTick(now, bucketInfo), bucketInfo)
-	// // Update
-	// r.Client.HMSet(r.Key, map[string]interface{}{
-	// 	availField:      avail,
-	// 	latestTickField: latestTick,
-	// })
 	return res.(int64)
 }
 
@@ -167,12 +159,14 @@ func (r *redisBucket) adjustAvail(tick int64, bucketInfo map[string]string) (ava
 
 // RedisStorage is a redisBucket factory.
 type RedisStorage struct {
+	Expire time.Duration
 	Client *redis.Client
 }
 
 // NewRedisBucket initializes the in-memory redisBucket store.
-func NewRedisBucket(client *redis.Client) *RedisStorage {
+func NewRedisBucket(expire time.Duration, client *redis.Client) *RedisStorage {
 	return &RedisStorage{
+		Expire: expire,
 		Client: client,
 	}
 }
@@ -237,7 +231,7 @@ func (r *RedisStorage) create(key string, fillInterval time.Duration, capacity, 
 	if err != nil {
 		return nil, err
 	}
-	r.Client.Expire(key, 3*time.Hour)
+	r.Client.Expire(key, r.Expire)
 
 	return &redisBucket{
 		Key:    key,
