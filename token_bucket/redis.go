@@ -1,9 +1,10 @@
 package token_bucket
 
 import (
-	"fmt"
 	"strconv"
 	"time"
+
+	"log"
 
 	"github.com/go-redis/redis"
 )
@@ -70,8 +71,7 @@ func (r *redisBucket) acquire(now time.Time, count int64) int64 {
 		count,
 	).Result()
 	if err != nil {
-		// TODO Log
-		fmt.Println("err", err)
+		log.Printf("Eval luaAcquire: %v\n", err)
 		return 0
 	}
 
@@ -91,8 +91,7 @@ func (r *redisBucket) tryAcquire(now time.Time, count int64, maxWait time.Durati
 		count,
 	).Result()
 	if err != nil {
-		// TODO Log
-		fmt.Println("err", err)
+		log.Printf("Eval luaTryAcquire: %v\n", err)
 		return 0, false
 	}
 
@@ -118,8 +117,7 @@ func (r *redisBucket) available(now time.Time) int64 {
 		strconv.FormatInt(now.UnixNano(), 10),
 	).Result()
 	if err != nil {
-		// TODO Log
-		fmt.Println("err", err)
+		log.Printf("Eval luaAvailable: %v\n", err)
 		return 0
 	}
 
