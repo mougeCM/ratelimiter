@@ -71,7 +71,9 @@ func (r *redisBucket) acquire(now time.Time, count int64) int64 {
 		count,
 	).Result()
 	if err != nil {
-		log.Printf("Eval luaAcquire: %v\n", err)
+		if err != redis.Nil {
+			log.Printf("Eval luaAcquire: %v\n", err)
+		}
 		return 0
 	}
 
@@ -91,8 +93,12 @@ func (r *redisBucket) tryAcquire(now time.Time, count int64, maxWait time.Durati
 		count,
 	).Result()
 	if err != nil {
-		log.Printf("Eval luaTryAcquire: %v\n", err)
-		return 0, false
+		if err != redis.Nil {
+			log.Printf("Eval luaTryAcquire: %v\n", err)
+			return 0, false
+		} else {
+			return 0, true
+		}
 	}
 
 	// token is enough
@@ -117,7 +123,9 @@ func (r *redisBucket) available(now time.Time) int64 {
 		strconv.FormatInt(now.UnixNano(), 10),
 	).Result()
 	if err != nil {
-		log.Printf("Eval luaAvailable: %v\n", err)
+		if err != redis.Nil {
+			log.Printf("Eval luaAvailable: %v\n", err)
+		}
 		return 0
 	}
 
