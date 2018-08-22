@@ -1,4 +1,4 @@
-package token_bucket
+package tkbucket
 
 const (
 	luaCommonFuc = `
