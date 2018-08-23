@@ -167,12 +167,12 @@ func (r *redisBucket) adjustAvail(tick int64, bucketInfo map[string]string) (ava
 
 // RedisStorage is a redisBucket factory.
 type RedisStorage struct {
-	Expire time.Duration
 	Client *redis.Client
+	Expire time.Duration
 }
 
 // NewRedisStorage initializes the in-memory redisBucket store.
-func NewRedisStorage(expire time.Duration, client *redis.Client) *RedisStorage {
+func NewRedisStorage(client *redis.Client, expire time.Duration) *RedisStorage {
 	return &RedisStorage{
 		Expire: expire,
 		Client: client,

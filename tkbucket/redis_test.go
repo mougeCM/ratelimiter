@@ -22,7 +22,7 @@ func TestRedisAcquire(t *testing.T) {
 	asserts := assert.New(t)
 
 	for i, test := range acquire1Tests {
-		nrs := NewRedisStorage(bucketExpire, redisClient)
+		nrs := NewRedisStorage(redisClient, bucketExpire)
 		// NOTE: Reset data
 		nrs.Client.FlushDB()
 
@@ -37,7 +37,7 @@ func TestRedisAcquire(t *testing.T) {
 	}
 
 	for i, test := range acquire2Tests {
-		nrs := NewRedisStorage(bucketExpire, redisClient)
+		nrs := NewRedisStorage(redisClient, bucketExpire)
 		// NOTE: Reset data
 		nrs.Client.FlushDB()
 
@@ -63,7 +63,7 @@ func TestRedisTryAcquire(t *testing.T) {
 	asserts := assert.New(t)
 
 	for i, test := range tryAcquireTests {
-		nrs := NewRedisStorage(bucketExpire, redisClient)
+		nrs := NewRedisStorage(redisClient, bucketExpire)
 		// NOTE: Reset data
 		nrs.Client.FlushDB()
 
@@ -86,7 +86,7 @@ func TestRedisPanics(t *testing.T) {
 	asserts := assert.New(t)
 
 	asserts.NotPanics(func() {
-		nrs := NewRedisStorage(bucketExpire, redisClient)
+		nrs := NewRedisStorage(redisClient, bucketExpire)
 		// NOTE: Reset data
 		nrs.Client.FlushDB()
 
@@ -94,7 +94,7 @@ func TestRedisPanics(t *testing.T) {
 	}, "token bucket fill interval is not > 0")
 
 	asserts.NotPanics(func() {
-		nrs := NewRedisStorage(bucketExpire, redisClient)
+		nrs := NewRedisStorage(redisClient, bucketExpire)
 		// NOTE: Reset data
 		nrs.Client.FlushDB()
 
@@ -102,7 +102,7 @@ func TestRedisPanics(t *testing.T) {
 	}, "token bucket capacity is not > 0")
 
 	asserts.NotPanics(func() {
-		nrs := NewRedisStorage(bucketExpire, redisClient)
+		nrs := NewRedisStorage(redisClient, bucketExpire)
 		// NOTE: Reset data
 		nrs.Client.FlushDB()
 
@@ -112,7 +112,7 @@ func TestRedisPanics(t *testing.T) {
 
 //------------------------------------Benchmark------------------------------------------
 func BenchmarkRedisWait(b *testing.B) {
-	nrs := NewRedisStorage(bucketExpire, redisClient)
+	nrs := NewRedisStorage(redisClient, bucketExpire)
 	// NOTE: Reset data
 	nrs.Client.FlushDB()
 
@@ -124,7 +124,7 @@ func BenchmarkRedisWait(b *testing.B) {
 }
 
 func BenchmarkRedisAcquire(b *testing.B) {
-	nrs := NewRedisStorage(bucketExpire, redisClient)
+	nrs := NewRedisStorage(redisClient, bucketExpire)
 	// NOTE: Reset data
 	nrs.Client.FlushDB()
 
