@@ -22,11 +22,11 @@ func TestRedisAcquire(t *testing.T) {
 	asserts := assert.New(t)
 
 	for i, test := range acquire1Tests {
-		nrb := NewRedisBucket(bucketExpire, redisClient)
+		nrs := NewRedisStorage(bucketExpire, redisClient)
 		// NOTE: Reset data
-		nrb.Client.FlushDB()
+		nrs.Client.FlushDB()
 
-		tb, err := nrb.CreateWithQuantum(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity, test.quantum)
+		tb, err := nrs.CreateWithQuantum(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity, test.quantum)
 		asserts.Nil(err, "Token bucket create failed")
 
 		for j, req := range test.reqs {
@@ -37,11 +37,11 @@ func TestRedisAcquire(t *testing.T) {
 	}
 
 	for i, test := range acquire2Tests {
-		nrb := NewRedisBucket(bucketExpire, redisClient)
+		nrs := NewRedisStorage(bucketExpire, redisClient)
 		// NOTE: Reset data
-		nrb.Client.FlushDB()
+		nrs.Client.FlushDB()
 
-		tb, err := nrb.Create(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity)
+		tb, err := nrs.Create(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity)
 		asserts.Nil(err, "Token bucket create failed")
 
 		// The number of tokens taked by the test is correct.
@@ -63,11 +63,11 @@ func TestRedisTryAcquire(t *testing.T) {
 	asserts := assert.New(t)
 
 	for i, test := range tryAcquireTests {
-		nrb := NewRedisBucket(bucketExpire, redisClient)
+		nrs := NewRedisStorage(bucketExpire, redisClient)
 		// NOTE: Reset data
-		nrb.Client.FlushDB()
+		nrs.Client.FlushDB()
 
-		tb, err := nrb.Create(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity)
+		tb, err := nrs.Create(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity)
 		asserts.Nil(err, "Token bucket create failed")
 
 		for j, req := range test.reqs {
@@ -86,37 +86,37 @@ func TestRedisPanics(t *testing.T) {
 	asserts := assert.New(t)
 
 	asserts.NotPanics(func() {
-		nrb := NewRedisBucket(bucketExpire, redisClient)
+		nrs := NewRedisStorage(bucketExpire, redisClient)
 		// NOTE: Reset data
-		nrb.Client.FlushDB()
+		nrs.Client.FlushDB()
 
-		nrb.Create("msf_redis_bucket", 1, 1)
+		nrs.Create("msf_redis_bucket", 1, 1)
 	}, "token bucket fill interval is not > 0")
 
 	asserts.NotPanics(func() {
-		nrb := NewRedisBucket(bucketExpire, redisClient)
+		nrs := NewRedisStorage(bucketExpire, redisClient)
 		// NOTE: Reset data
-		nrb.Client.FlushDB()
+		nrs.Client.FlushDB()
 
-		nrb.Create("msf_redis_bucket", 1, 1)
+		nrs.Create("msf_redis_bucket", 1, 1)
 	}, "token bucket capacity is not > 0")
 
 	asserts.NotPanics(func() {
-		nrb := NewRedisBucket(bucketExpire, redisClient)
+		nrs := NewRedisStorage(bucketExpire, redisClient)
 		// NOTE: Reset data
-		nrb.Client.FlushDB()
+		nrs.Client.FlushDB()
 
-		nrb.CreateWithQuantum("msf_redis_bucket", 1, 2, 10)
+		nrs.CreateWithQuantum("msf_redis_bucket", 1, 2, 10)
 	}, "token bucket quantum is not > 0")
 }
 
 //------------------------------------Benchmark------------------------------------------
 func BenchmarkRedisWait(b *testing.B) {
-	nrb := NewRedisBucket(bucketExpire, redisClient)
+	nrs := NewRedisStorage(bucketExpire, redisClient)
 	// NOTE: Reset data
-	nrb.Client.FlushDB()
+	nrs.Client.FlushDB()
 
-	tb, _ := nrb.Create("msf_token_bucket", 1, 16*1024)
+	tb, _ := nrs.Create("msf_token_bucket", 1, 16*1024)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tb.Wait(1)
@@ -124,11 +124,11 @@ func BenchmarkRedisWait(b *testing.B) {
 }
 
 func BenchmarkRedisAcquire(b *testing.B) {
-	nrb := NewRedisBucket(bucketExpire, redisClient)
+	nrs := NewRedisStorage(bucketExpire, redisClient)
 	// NOTE: Reset data
-	nrb.Client.FlushDB()
+	nrs.Client.FlushDB()
 
-	tb, _ := nrb.Create("msf_token_bucket", 1, 16*1024)
+	tb, _ := nrs.Create("msf_token_bucket", 1, 16*1024)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tb.Acquire(1)

@@ -169,8 +169,8 @@ func TestMemoryAcquire(t *testing.T) {
 	asserts := assert.New(t)
 
 	for i, test := range acquire1Tests {
-		nmb := NewMemoryBucket()
-		tb, err := nmb.CreateWithQuantum(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity, test.quantum)
+		nms := NewMemoryStorage()
+		tb, err := nms.CreateWithQuantum(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity, test.quantum)
 		asserts.Nil(err, "Token bucket create failed")
 
 		for j, req := range test.reqs {
@@ -181,8 +181,8 @@ func TestMemoryAcquire(t *testing.T) {
 	}
 
 	for i, test := range acquire2Tests {
-		nmb := NewMemoryBucket()
-		tb, err := nmb.Create(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity)
+		nms := NewMemoryStorage()
+		tb, err := nms.Create(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity)
 		asserts.Nil(err, "Token bucket create failed")
 
 		// The number of tokens taked by the test is correct.
@@ -310,8 +310,8 @@ func TestMemoryTryAcquire(t *testing.T) {
 	asserts := assert.New(t)
 
 	for i, test := range tryAcquireTests {
-		nmb := NewMemoryBucket()
-		tb, err := nmb.Create(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity)
+		nms := NewMemoryStorage()
+		tb, err := nms.Create(fmt.Sprintf("msf_token_bucket_:%d", i), test.fillInterval, test.capacity)
 		asserts.Nil(err, "Token bucket create failed")
 
 		for j, req := range test.reqs {
@@ -327,25 +327,25 @@ func TestMemoryPanics(t *testing.T) {
 	asserts := assert.New(t)
 
 	asserts.NotPanics(func() {
-		nmb := NewMemoryBucket()
-		nmb.Create("msf_memory_bucket", 1, 1)
+		nms := NewMemoryStorage()
+		nms.Create("msf_memory_bucket", 1, 1)
 	}, "token bucket fill interval is not > 0")
 
 	asserts.NotPanics(func() {
-		nmb := NewMemoryBucket()
-		nmb.Create("msf_memory_bucket", 1, 1)
+		nms := NewMemoryStorage()
+		nms.Create("msf_memory_bucket", 1, 1)
 	}, "token bucket capacity is not > 0")
 
 	asserts.NotPanics(func() {
-		nmb := NewMemoryBucket()
-		nmb.CreateWithQuantum("msf_memory_bucket", 1, 2, 10)
+		nms := NewMemoryStorage()
+		nms.CreateWithQuantum("msf_memory_bucket", 1, 2, 10)
 	}, "token bucket quantum is not > 0")
 }
 
 //------------------------------------Benchmark------------------------------------------
 func BenchmarkMemoryWait(b *testing.B) {
-	nmb := NewMemoryBucket()
-	tb, _ := nmb.Create("msf_token_bucket", 1, 16*1024)
+	nms := NewMemoryStorage()
+	tb, _ := nms.Create("msf_token_bucket", 1, 16*1024)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tb.Wait(1)
@@ -353,8 +353,8 @@ func BenchmarkMemoryWait(b *testing.B) {
 }
 
 func BenchmarkMemoryAcquire(b *testing.B) {
-	nmb := NewMemoryBucket()
-	tb, _ := nmb.Create("msf_token_bucket", 1, 16*1024)
+	nms := NewMemoryStorage()
+	tb, _ := nms.Create("msf_token_bucket", 1, 16*1024)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tb.Acquire(1)

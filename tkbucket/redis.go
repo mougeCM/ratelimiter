@@ -171,8 +171,8 @@ type RedisStorage struct {
 	Client *redis.Client
 }
 
-// NewRedisBucket initializes the in-memory redisBucket store.
-func NewRedisBucket(expire time.Duration, client *redis.Client) *RedisStorage {
+// NewRedisStorage initializes the in-memory redisBucket store.
+func NewRedisStorage(expire time.Duration, client *redis.Client) *RedisStorage {
 	return &RedisStorage{
 		Expire: expire,
 		Client: client,

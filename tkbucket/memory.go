@@ -145,8 +145,8 @@ type MemoryStorage struct {
 	buckets map[string]*memoryBucket
 }
 
-// NewMemoryBucket initializes the in-memory memoryBucket store.
-func NewMemoryBucket() *MemoryStorage {
+// NewMemoryStorage initializes the in-memory memoryBucket store.
+func NewMemoryStorage() *MemoryStorage {
 	return &MemoryStorage{
 		buckets: make(map[string]*memoryBucket),
 	}
