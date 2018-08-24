@@ -106,7 +106,7 @@ func (r *redisBucket) tryAcquire(now time.Time, count int64, maxWait time.Durati
 		return 0, true
 	}
 
-	waitTime := time.Duration(res.(int64)-now.UnixNano()) * time.Nanosecond
+	waitTime := time.Duration(res.(int64) - now.UnixNano())
 	if waitTime > maxWait {
 		return 0, false
 	}
